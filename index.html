@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Charlie 🎂</title>
+<style>
+:root{--bg:#06170f;--panel:#0d281b;--green:#58e39a;--light:#a4f5c7;--text:#effff5;--muted:#9ab9a7}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:24px;display:flex;align-items:center;justify-content:center;color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 15% 10%,#15462d 0,transparent 30%),radial-gradient(circle at 90% 90%,#103b26 0,transparent 30%),var(--bg)}
+.card{width:min(600px,100%);padding:32px 27px;background:rgba(13,40,27,.94);border:1px solid rgba(164,245,199,.17);border-radius:25px;box-shadow:0 25px 80px #0008;text-align:center}
+.terminal{font-size:11px;letter-spacing:2px;color:var(--green);font-weight:800;margin-bottom:21px}
+.icon{width:64px;height:64px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:#58e39a12;border:1px solid #a4f5c729;font-size:30px}
+h1{font-size:clamp(29px,7vw,43px);line-height:1.05;margin:0 0 15px}
+.message{min-height:150px;display:flex;flex-direction:column;justify-content:center;gap:11px;font-size:17px;line-height:1.55}
+.highlight{color:var(--light);font-weight:750}.small{color:var(--muted);font-size:14px}
+.progress-wrap{max-width:410px;margin:16px auto 17px}.progress{height:8px;background:#ffffff12;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--light));transition:width .2s}
+.timer{font-size:13px;color:var(--muted);margin-top:8px}
+button{width:100%;max-width:410px;border:0;border-radius:14px;padding:15px 18px;font-size:16px;font-weight:850;cursor:pointer;color:#052014;background:var(--green);transition:.2s}
+button:hover{transform:translateY(-2px);box-shadow:0 10px 28px #58e39a33}
+.find{margin-top:10px;background:#183c2a;color:var(--light);border:1px solid #a4f5c72b}
+.find:hover{background:#205238}
+.hidden{display:none!important}
+.letter{text-align:left;font-size:17px;line-height:1.72;color:#e9faf0}
+.letter p{margin:0 0 19px}.signature{text-align:center;color:var(--light);font-weight:750;margin-top:25px}
+.fade{animation:fade .55s ease}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.shake{animation:shake .35s ease}@keyframes shake{25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+</style>
+</head>
+<body>
+<main class="card" id="app">
+  <div class="terminal">BIRTHDAY SURPRISE // SECURE CONNECTION</div>
+  <div class="icon" id="icon">🟢</div>
+  <h1 id="title">CONGRATULATIONS!</h1>
+  <section class="message" id="message">
+    <div>You have successfully scanned a random QR code.</div>
+    <div class="highlight">Unfortunately, there is no free money here. 💸</div>
+    <div class="small">Please remain calm. This was intentional.</div>
+  </section>
+
+  <div class="progress-wrap">
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="timer" id="timer">The surprise unlocks automatically in 30 seconds...</div>
+  </div>
+
+  <button id="found" class="find">📷 I FOUND THE GIFT — CONTINUE</button>
+  <button id="continue" class="hidden">CONTINUE →</button>
+</main>
+
+<script>
+const steps=[
+ [0,"CONGRATULATIONS!","🟢",`You have successfully scanned a random QR code.<div class="highlight">Unfortunately, there is no free money here. 💸</div><div class="small">Please remain calm. This was intentional.</div>`],
+ [6,"WAIT... THERE'S MORE","👀",`But don't worry. There <span class="highlight">is</span> something waiting for you.<div class="small">Hint: It's not on this screen.</div>`],
+ [13,"IMPORTANT INFORMATION","📦",`<span class="highlight">Your prize has been located.</span><div>...probably.</div><div class="small">You may want to look around.</div>`],
+ [21,"PLEASE STAND BY","⏳",`Preparing your highly sophisticated birthday experience...<div class="small">This process is extremely advanced. Trust me.</div>`],
+ [27,"ALMOST THERE","🔓",`Finalizing absolutely necessary birthday-related technology...<div class="small">No money was harmed during this process.</div>`]
+];
+
+let start=Date.now(),last=-1,unlocked=false;
+const $=id=>document.getElementById(id);
+function step(i){
+ if(i===last)return; last=i;
+ $("title").textContent=steps[i][1];$("icon").textContent=steps[i][2];$("message").innerHTML=steps[i][3];
+ $("message").classList.remove("fade");void $("message").offsetWidth;$("message").classList.add("fade");
+}
+function unlock(reason){
+ if(unlocked)return;unlocked=true;
+ $("found").classList.add("hidden");$("continue").classList.remove("hidden");
+ $("timer").textContent=reason==="found"?"🎉 Gift found! You can continue.":"✓ Okay, you can continue now.";
+ $("bar").style.width="100%";
+}
+function tick(){
+ const elapsed=(Date.now()-start)/1000,remaining=Math.max(0,30-elapsed);
+ $("bar").style.width=Math.min(100,elapsed/30*100)+"%";
+ let i=0;for(let n=0;n<steps.length;n++)if(elapsed>=steps[n][0])i=n;step(i);
+ if(!unlocked){
+   if(remaining>0){$("timer").textContent=`The surprise unlocks automatically in ${Math.ceil(remaining)} second${Math.ceil(remaining)==1?"":"s"}...`;requestAnimationFrame(tick)}
+   else unlock("time");
+ }
+}
+$("found").onclick=()=>unlock("found");
+$("continue").onclick=showLetter;
+function showLetter(){
+ $("app").innerHTML=`
+ <div class="terminal">BIRTHDAY SURPRISE // MESSAGE UNLOCKED</div>
+ <div class="icon">🎂</div>
+ <h1>For Charlie</h1>
+ <section class="letter fade">
+   <p>Hi Charlie,</p>
+   <p>I know we don't talk often and I'm always awkward around you and your family. But, I assure you na ganito lang talaga ako; quiet and observant.</p>
+   <p>Enough about me, it's about you.</p>
+   <p>You're stepping into the world of adulthood. You're going to enter a heap of troubles, worries, doubts, and fears. But, you'll always have us, your family.</p>
+   <p>I hope this camera I'll be giving you will be put to good use, which I'm definitely sure you'll do.</p>
+   <p>Enjoy your new camera, and I'm very sorry for the late gift!</p>
+   <p>I'm always here if you need me. :D</p>
+   <div class="signature">Happy Birthday, Charlie! 🎉📷</div>
+ </section>`;
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
